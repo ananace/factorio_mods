@@ -1,3 +1,5 @@
+require 'json'
+
 require 'factorio_mods/version'
 
 module FactorioMods

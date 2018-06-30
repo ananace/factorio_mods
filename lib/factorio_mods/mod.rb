@@ -21,7 +21,7 @@ module FactorioMods
     class Release
       attr_accessor :downloads_count, :factorio_version, :file_name, :file_size,
                     :game_version, :id, :info_json, :sha1, :version
-      attr_reader :download_url, :released_at
+      attr_reader :released_at
 
       def initialize(data = {})
         data.each do |k, v|
@@ -29,8 +29,36 @@ module FactorioMods
         end
       end
 
+      def download
+        Net::HTTP.get(download_url)
+      end
+
+      def download_to(path)
+        dir = ''
+        if Dir.exist? path
+          dir = path
+          path = file_name
+        end
+
+        File.open(dir + path, 'wb') do |file|
+          Net::HTTP.get_response(download_url) do |resp|
+            resp.value
+            resp.read_body { |data| file.write(data) }
+          end
+        end
+
+        dir + path
+      end
+
+      def download_url
+        @download_url.dup.tap do |url|
+          a = FactorioMods::Api::WebAuthentication
+          url.query = "username=#{a.username}&token=#{a.token}" if a.token
+        end
+      end
+
       def download_url=(url)
-        @download_url = URI(FactorioMods::Api::ModPortal::BASE_URL + url)
+        @download_url = URI(File.join(FactorioMods::Api::ModPortal::BASE_URL, url))
       end
 
       def released_at=(time)
@@ -66,8 +94,8 @@ module FactorioMods
       end
     end
 
-    def reload!(api = FactorioMods::Api::ModPortal.new)
-      data = api.raw_mod(name)
+    def reload!
+      data = FactorioMods::Api::ModPortal.raw_mod(name)
       data.each do |k, v|
         send "#{k}=".to_sym, v if respond_to? "#{k}=".to_sym
       end

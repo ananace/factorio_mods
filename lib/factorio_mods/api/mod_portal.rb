@@ -5,7 +5,7 @@ module FactorioMods::Api
   class ModPortal
     BASE_URL = 'https://mods.factorio.com'.freeze
 
-    def all_mods(data = {})
+    def self.all_mods(data = {})
       paginate = data.delete :paginate
 
       uri = URI(File.join(BASE_URL, 'api', 'mods'))
@@ -23,12 +23,12 @@ module FactorioMods::Api
       results
     end
 
-    def mod(name)
+    def self.mod(name)
       uri = URI(File.join(BASE_URL, 'api', 'mods', name))
       FactorioMods::Mod.new JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end
 
-    def mods(*names)
+    def self.mods(*names)
       uri = URI(File.join(BASE_URL, 'api', 'mods'))
       uri.query = 'page_size=max&' + names.map { |mod| "namelist=#{mod}" }.join('&')
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
@@ -36,7 +36,7 @@ module FactorioMods::Api
           .map { |mod| FactorioMods::Mod.new mod }
     end
 
-    def raw_mod(name)
+    def self.raw_mod(name)
       uri = URI(File.join(BASE_URL, 'api', 'mods', name))
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end

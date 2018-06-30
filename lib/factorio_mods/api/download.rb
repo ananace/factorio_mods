@@ -11,7 +11,7 @@ module FactorioMods::Api
       end
     end
 
-    def login(username_or_email, password)
+    def self.login(username_or_email, password)
       uri = URI(BASE_URL + '/login')
       http = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true)
 
@@ -42,7 +42,7 @@ module FactorioMods::Api
       http.finish if http
     end
 
-    def download(version, build = :alpha, distro = nil)
+    def self.download(version, build = :alpha, distro = nil)
       raise 'Needs to be logged in' unless @session
 
       distro ||= if FactorioMods::OS.windows?
@@ -76,7 +76,7 @@ module FactorioMods::Api
       res
     end
 
-    def download_to(version, target = nil, build = :alpha, distro = nil)
+    def self.download_to(version, target = nil, build = :alpha, distro = nil)
       dir = ''
       if Dir.exist? target
         dir = File.join target, ''
@@ -93,7 +93,7 @@ module FactorioMods::Api
       dir + target
     end
 
-    def available_versions(build = :stable)
+    def self.available_versions(build = :stable)
       raise 'Needs to be logged in' unless @session
       endpoints = {
         stable: '/download',
