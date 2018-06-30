@@ -8,7 +8,7 @@ module FactorioMods::Api
     def self.all_mods(data = {})
       paginate = data.delete :paginate
 
-      uri = URI(File.join(BASE_URL, 'api', 'mods'))
+      uri = URI(BASE_URL + '/api/mods')
       uri.query = data.map { |k, v| "#{k}=#{v}" }.join '&'
 
       data = JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
@@ -24,12 +24,12 @@ module FactorioMods::Api
     end
 
     def self.mod(name)
-      uri = URI(File.join(BASE_URL, 'api', 'mods', name))
+      uri = URI(BASE_URL + '/api/mods/' + name)
       FactorioMods::Mod.new JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end
 
     def self.mods(*names)
-      uri = URI(File.join(BASE_URL, 'api', 'mods'))
+      uri = URI(BASE_URL + '/api/mods')
       uri.query = 'page_size=max&' + names.map { |mod| "namelist=#{mod}" }.join('&')
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
           .fetch(:results)
@@ -37,7 +37,7 @@ module FactorioMods::Api
     end
 
     def self.raw_mod(name)
-      uri = URI(File.join(BASE_URL, 'api', 'mods', name))
+      uri = URI(BASE_URL + '/api/mods/' + name)
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end
   end

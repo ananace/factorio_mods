@@ -58,7 +58,7 @@ module FactorioMods
       end
 
       def download_url=(url)
-        @download_url = URI(File.join(FactorioMods::Api::ModPortal::BASE_URL, url))
+        @download_url = URI(FactorioMods::Api::ModPortal::BASE_URL + url)
       end
 
       def released_at=(time)

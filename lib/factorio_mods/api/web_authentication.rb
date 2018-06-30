@@ -13,7 +13,7 @@ module FactorioMods::Api
     end
 
     def self.login(username, password, version = API_VERSION, ownership = false)
-      resp = Net::HTTP.post_form(URI(File.join(BASE_URL, '/api-login')),
+      resp = Net::HTTP.post_form(URI(BASE_URL + '/api-login'),
                                  username: username,
                                  password: password,
                                  api_version: version,
