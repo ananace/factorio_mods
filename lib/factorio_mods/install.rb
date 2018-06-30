@@ -4,15 +4,36 @@ module FactorioMods
   class Install
     attr_reader :base_path, :version, :architecture, :is_steam
 
-    def initialize(path)
-      @base_path = path
+    def self.discover
+      to_scan = if FactorioMods::OS.windows?
+                  [
+                    'C:\Program Files (x86)\Steam\steamapps\common\Factorio',
+                    'C:\Program Files\Factorio'
+                  ]
+                elsif FactorioMods::OS.mac?
+                  [
+                    '~/Library/Application Support/Steam/steamapps/common/Factorio/factorio.app/Contents',
+                    '/Applications/factorio.app/Contents'
+                  ]
+                elsif FactorioMods::OS.linux?
+                  [
+                    '~/.steam/steam/steamapps/common/Factorio',
+                    '~/.factorio'
+                  ]
+                end
 
-      @is_steam = !(path.tr('\\', '/') =~ %r{/steamapps/common/}i).nil?
+      to_scan.map { |path| Install.new path }.select(&:valid?)
+    end
+
+    def initialize(path)
+      @base_path = File.expand_path path
+      return unless valid?
 
       info = JSON.parse(File.read(File.join(mod_path('base'), 'info.json')),
                         symbolize_names: true)
-      @version = info[:version]
 
+      @version = info[:version]
+      @is_steam = !(path.tr('\\', '/') =~ %r{/steamapps/common/}i).nil?
       @architecture = Dir.entries(File.join(base_path, 'bin'))
                          .reject { |e| e.start_with? '.' }
                          .first
