@@ -5,7 +5,7 @@
 
 Install it with gem
 
-    $ gem install ruby-factorio-mods
+    $ gem install factorio_mods
 
 ## Usage
 
@@ -14,7 +14,7 @@ TODO: Implement thor-based CLI
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ananace/ruby-factorio-mods
+Bug reports and pull requests are welcome on GitHub at https://github.com/ananace/factorio_mods
 
 ## License
 
