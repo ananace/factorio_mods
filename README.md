@@ -1,5 +1,6 @@
-# Factorio management gem (focussed on use for modding)
+# Factorio management gem
 
+The main focus for this gem is for modding and management of mods, but it contains APIs for more uses than that.
 
 ## Installation
 
