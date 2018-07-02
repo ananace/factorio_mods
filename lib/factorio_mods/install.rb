@@ -90,7 +90,7 @@ module FactorioMods
     end
 
     def mods_path
-      File.join read_path, 'mods'
+      File.join write_path, 'mods'
     end
 
     def saves_path
