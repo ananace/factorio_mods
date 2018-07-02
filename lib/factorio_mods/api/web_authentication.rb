@@ -4,12 +4,8 @@ module FactorioMods::Api
     BASE_URL = 'https://auth.factorio.com'.freeze
     API_VERSION = 2
 
-    def self.username
-      @username
-    end
-
-    def self.token
-      @token
+    class << self
+      attr_accessor :username, :token
     end
 
     def self.login(username, password, version = API_VERSION, ownership = false)

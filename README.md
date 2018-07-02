@@ -11,6 +11,21 @@ Install it with gem
 
 TODO: Implement thor-based CLI
 
+```ruby
+# Acquire a token
+FactorioMods::Api::WebAuthentication.login 'username', 'password'
+# or
+FactorioMods::Api::WebAuthentication.tap do |auth|
+  auth.username = 'username'
+  auth.token    = 'token'
+end
+
+install = FactorioMods::Install.new '~/.factorio'
+# or
+install = FactorioMods::Install.discover.first
+
+install.mod_manager.install_mod('angelssmelting')
+```
 
 ## Contributing
 
