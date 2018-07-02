@@ -93,6 +93,10 @@ module FactorioMods
       File.join read_path, 'mods'
     end
 
+    def saves_path
+      File.join write_path, 'saves'
+    end
+
     def mod_path(mod)
       if %w[base core].include? mod.to_s
         File.join data_path, mod
