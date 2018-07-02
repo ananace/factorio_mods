@@ -19,9 +19,10 @@ module FactorioMods
     end
 
     class Release
-      attr_accessor :downloads_count, :factorio_version, :file_name, :file_size,
-                    :game_version, :id, :info_json, :sha1, :version
+      attr_accessor :downloads_count, :file_name, :file_size,
+                    :id, :info_json, :sha1, :version
       attr_reader :released_at
+      attr_writer :factorio_version, :game_version
 
       def initialize(data = {})
         data.each do |k, v|
@@ -29,21 +30,34 @@ module FactorioMods
         end
       end
 
+      def factorio_version
+        @factorio_version || info_json[:factorio_version]
+      end
+
+      def game_version
+        @game_version || info_json[:factorio_version]
+      end
+
       def download
         Net::HTTP.get(download_url)
       end
 
       def download_to(path)
-        dir = ''
-        if Dir.exist? path
-          dir = path
-          path = file_name
-        end
+        path = File.join path, file_name if Dir.exist? path
 
-        File.open(dir + path, 'wb') do |file|
-          Net::HTTP.get_response(download_url) do |resp|
+        File.open(path, 'wb') do |file|
+          puts "Saving to #{file.path}..."
+          store = proc do |resp|
             resp.value
             resp.read_body { |data| file.write(data) }
+          end
+
+          Net::HTTP.get_response(download_url) do |resp|
+            if resp.is_a? Net::HTTPFound
+              Net::HTTP.get_response(URI(resp['location']), &store)
+            else
+              store.call resp
+            end
           end
         end
 

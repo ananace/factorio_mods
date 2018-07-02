@@ -39,6 +39,10 @@ module FactorioMods
                          .first
     end
 
+    def mod_manager
+      @mod_manager ||= ModManager.new self
+    end
+
     def binary
       if OS.windows?
         File.join bin_path, 'factorio.exe'
@@ -79,6 +83,10 @@ module FactorioMods
 
     def data_path
       File.join base_path, 'data'
+    end
+
+    def modlist_path
+      File.join mods_path, 'mod-list.json'
     end
 
     def mods_path
