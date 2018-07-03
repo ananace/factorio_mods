@@ -26,6 +26,8 @@ install = FactorioMods::Install.new '~/.factorio'
 install = FactorioMods::Install.discover.first
 
 install.mod_manager.install_mod('angelssmelting')
+# You can also specify exact version requirements, with the same method as rubygems version matching
+install.mod_manager.install_mod('angelssmelting', version: '~> 2.0')
 ```
 
 ## Contributing

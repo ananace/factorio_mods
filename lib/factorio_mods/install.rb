@@ -57,7 +57,9 @@ module FactorioMods
           config = IniFile.load(File.join(system_path, 'config', 'config.ini'))
 
           config['path']['read-data']
-            .gsub '__PATH__system-read-data__', system_path
+            .gsub('__PATH__system-read-data__', system_path)
+            .gsub('__PATH__system-write-data__', system_path)
+            .gsub('__PATH__executable__', base_path)
         else
           base_path
         end
@@ -70,7 +72,9 @@ module FactorioMods
           config = IniFile.load(File.join(system_path, 'config', 'config.ini'))
 
           config['path']['write-data']
-            .gsub '__PATH__system-write-data__', system_path
+            .gsub('__PATH__system-read-data__', system_path)
+            .gsub('__PATH__system-write-data__', system_path)
+            .gsub('__PATH__executable__', base_path)
         else
           base_path
         end

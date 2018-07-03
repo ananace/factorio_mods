@@ -1,3 +1,5 @@
+require 'gem/dependency'
+
 module FactorioMods
   class ModManager
     attr_reader :install
@@ -17,13 +19,22 @@ module FactorioMods
       File.write(install.modlist_path, JSON.generate(mod_list, indent: '  '))
     end
 
-    def install_mod(mod)
+    def install_mod(mod, options = {})
       mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
       mod.reload! unless mod.releases
 
       release = mod.releases
                    .select { |r| install.version.start_with? r.factorio_version }
-                   .max { |r| r.released_at.to_i }
+
+      release = if options[:version]
+                  release.find do |r|
+                    # Use rubygems version matching, to support things like '~> 1.0'
+                    Gem::Dependency('', options[:version]).match?('', r.version)
+                  end
+                else
+                  release.max { |r| r.released_at.to_i }
+                end
+
       release.download_to(install.mods_path)
       enable_mod mod
     end
