@@ -61,7 +61,7 @@ module FactorioMods
           end
         end
 
-        dir + path
+        path
       end
 
       def download_url

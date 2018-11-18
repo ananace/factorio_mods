@@ -1,6 +1,31 @@
-require 'gem/dependency'
+begin
+  require 'rubygems/dependency'
+rescue LoadError
+  require 'gem/dependency'
+end
+require 'zip'
 
 module FactorioMods
+  InstalledMod = Struct.new(:manager, :name, :enabled) do
+    def info
+      @info ||= begin
+        mod = manager.install.mod_path(name)
+        if File.file? mod
+          Zip::File.open(mod) do |zip|
+            file = zip.glob('**/info.json').first
+            JSON.parse(zip.read(file), symbolize_names: true)
+          end
+        else
+          JSON.parse(File.read(File.join(mod, 'info.json')), symbolize_names: true)
+        end
+      end
+    end
+
+    def to_s
+      name
+    end
+  end
+
   class ModManager
     attr_reader :install
 
@@ -8,15 +33,25 @@ module FactorioMods
       @install = install
       return unless install.valid?
 
-      @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)
+      reload!
     end
 
     def reload!
-      @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)
+      @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)[:mods].map do |mod|
+        InstalledMod.new(self, mod[:name], mod[:enabled])
+      end
     end
 
     def save!
-      File.write(install.modlist_path, JSON.generate(mod_list, indent: '  '))
+      data = {
+        mods: @mod_list.map do |mod|
+          {
+            name: mod.name,
+            enabled: mod.enabled
+          }
+        end
+      }
+      File.write(install.modlist_path, JSON.generate(data, indent: '  ', space: ' ', array_nl: "\n", object_nl: "\n"))
     end
 
     def install_mod(mod, options = {})
@@ -36,48 +71,42 @@ module FactorioMods
                 end
 
       release.download_to(install.mods_path)
-      enable_mod mod
+
+      @mod_list << InstalledMod.new(self, mod.name, true)
+      @mod_list.sort! { |a, b| a.name <=> b.name }
     end
 
     def remove_mod(mod)
-      mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
+      file = install.mod_path(mod)
 
-      file = install.mod_path(mod.name)
-      Dir.delete file if Dir.exist? file
-      File.delete file if File.exist? file
-      @mod_list[:mods].delete_if { |m| m[:name] == mod.name }
+      if file
+        Dir.delete file if File.directory? file
+        File.delete file if File.file? file
+      end
+
+      @mod_list.delete_if { |m| m.name == mod }
     end
 
     def enable_mod(mod)
-      mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
-
-      entry = @mod_list[:mods].find { |m| m[:name] == mod.name }
-      entry ||= begin
-        e = @mod_list[:mods] << { mod: mod.name, enabled: true }
-        @mod_list[:mods].sort! { |a, b| a[:name] <=> b[:name] }
-        e
-      end
-
-      entry[:enabled] = true
+      entry = @mod_list.find { |m| m.name == mod }
+      entry.enabled = true if entry
     end
 
     def disable_mod(mod)
-      mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
-
-      entry = @mod_list[:mods].find { |m| m[:name] == mod.name }
-      entry[:enabled] = false if entry
+      entry = @mod_list.find { |m| m.name == mod }
+      entry.enabled = false if entry
     end
 
     def mods
-      @mod_list[:mods].map { |m| m[:name] }
+      @mod_list
     end
 
     def disabled_mods
-      @mod_list[:mods].reject { |m| m[:enabled] }.map { |m| m[:name] }
+      @mod_list.reject(&:enabled)
     end
 
     def enabled_mods
-      @mod_list[:mods].select { |m| m[:enabled] }.map { |m| m[:name] }
+      @mod_list.select(&:enabled)
     end
   end
 end

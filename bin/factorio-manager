@@ -1,3 +1,100 @@
 #!/usr/bin/env ruby
 
+require 'factorio_mods'
+require 'thor'
 
+class FactorioManager < Thor
+  def self.exit_on_failure?
+    true
+  end
+
+  def initialize(*args)
+    super
+
+    FactorioMods::Api::WebAuthentication.username = _cache[:username] if _cache[:username]
+    FactorioMods::Api::WebAuthentication.token = _cache[:token]  if _cache[:token]
+  end
+
+  desc 'login', 'Log in to the Factorio web API'
+  def login(user, pass)
+    FactorioMods::Api::WebAuthentication.login(user, pass)
+
+    _cache[:username] = FactorioMods::Api::WebAuthentication.username
+    _cache[:token] = FactorioMods::Api::WebAuthentication.token
+
+    _save_cache
+  end
+
+  desc 'installs', 'List all available installs'
+  def installs
+    puts 'Discovered installs;'
+    _find_installs.each { |i| puts "  #{i.base_path} - #{i.version}" }
+  end
+
+  desc 'info', 'Gets information about the install'
+  def info
+    puts "Factorio version #{install.version} installed at #{install.base_path}"
+    puts
+    puts "#{mods.mods.count} mods, #{mods.enabled_mods.count} enabled, #{mods.disabled_mods.count} disabled."
+  end
+
+  desc 'list', 'Lists all mods'
+  def list
+    mods.mods.each do |mod|
+      puts "#{mod.enabled ? '+' : '-'} #{mod.name} (#{mod.info[:version]})"
+    end
+  end
+
+  desc 'add', 'Adds a mod'
+  def add(mod)
+    mods.install_mod(mod)
+    mods.save!
+  end
+
+  desc 'remove', 'Removes a mod'
+  def remove(mod)
+    mods.remove_mod(mod)
+    mods.save!
+  end
+
+  desc 'enable', 'Enables a mod'
+  def enable(mod)
+    mods.enable_mod mod
+    mods.save!
+  end
+
+  desc 'disable', 'Disables a mod'
+  def disable(mod)
+    mods.disable_mod mod
+    mods.save!
+  end
+
+  private
+
+  def _cache_path
+    File.expand_path('~/.cache/factorio-manager.json')
+  end
+
+  def _cache
+    @_cache ||= JSON.parse(File.read(_cache_path), symbolize_names: true) if File.exist? _cache_path
+    @_cache ||= {}
+  end
+
+  def _save_cache
+    File.write(_cache_path, JSON.generate(@_cache))
+  end
+
+  def _find_installs
+    FactorioMods::Install.discover
+  end
+
+  def install
+    @install ||= _find_installs.first
+  end
+
+  def mods
+    @mods ||= install.mod_manager
+  end
+end
+
+FactorioManager.start
