@@ -46,43 +46,47 @@ class CLI < Thor
 
 
   no_commands do
-
-  def _cache_path
-    File.expand_path('~/.cache/factorio-manager.json')
-  end
-
-  def _cache
-    @_cache ||= Cache.new(JSON.parse(File.read(_cache_path), symbolize_names: true)) if File.exist? _cache_path
-    @_cache ||= Cache.new
-  end
-
-  def _save_cache
-    File.write(_cache_path, JSON.generate(_cache))
-  end
-
-  def _installs
-    @installs ||= FactorioMods::Install.discover
-  end
-
-  def _install
-    return @install if @install
-
-    if _cache.key? :default_install
-      default = _cache.default_install
-
-      @install = default if default.is_a? FactorioMods::Install
-      @install ||= _installs[default] if default.is_a? Numeric
-      @install ||= _installs.find { |f| f.base_path == default } if default.is_a? String
-    else
-      @install = _installs.first
+    def _cache_path
+      File.expand_path('~/.cache/factorio-manager.json')
     end
-    @install
-  end
 
-  def _mods
-    @mods ||= _install.mod_manager
-  end
+    def _cache
+      @_cache ||= Cache.new(JSON.parse(File.read(_cache_path), symbolize_names: true)) if File.exist? _cache_path
+      @_cache ||= Cache.new
+    end
 
+    def _save_cache
+      File.write(_cache_path, JSON.generate(_cache))
+    end
+
+    def _installs
+      @installs ||= FactorioMods::Install.discover
+    end
+
+    def _install
+      if options[:install]
+        install = _installs.find { |f| f.base_path == options[:install] }
+        return install if install
+        return FactorioMods::Install.new options[:install]
+      end
+
+      return @install if @install
+
+      if _cache.key? :default_install
+        default = _cache.default_install
+
+        @install = default if default.is_a? FactorioMods::Install
+        @install ||= _installs[default] if default.is_a? Numeric
+        @install ||= _installs.find { |f| f.base_path == default } if default.is_a? String
+      else
+        @install = _installs.first
+      end
+      @install
+    end
+
+    def _mods
+      @mods ||= _install.mod_manager
+    end
   end
 end
 

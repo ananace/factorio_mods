@@ -17,12 +17,12 @@ class Install < Thor
   def show
     puts "Factorio version #{$CLI._install.version.bold} installed at #{$CLI._install.base_path}"
     puts
-    puts "#{$CLI._mods.mods.count.to_s.bold} mod(s), #{$CLI._mods.enabled_mods.count.to_s.light_green} enabled, #{$CLI.mods.disabled_mods.count.to_s.light_red} disabled."
+    puts "#{$CLI._mods.mods.count.to_s.bold} mod(s), #{$CLI._mods.enabled_mods.count.to_s.light_green} enabled, #{$CLI._mods.disabled_mods.count.to_s.light_red} disabled."
   end
 
   desc 'add PATH', 'Adds a manual install'
   def add(path)
-
+    
   end
 
   desc 'set NUM', 'Sets the default install'
