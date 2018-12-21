@@ -27,6 +27,8 @@ module FactorioMods
   end
 
   class ModManager
+    CORE_MODS = %w[base core].freeze
+
     attr_reader :install
 
     def initialize(install)
@@ -73,7 +75,12 @@ module FactorioMods
       release.download_to(install.mods_path)
 
       @mod_list << InstalledMod.new(self, mod.name, true)
-      @mod_list.sort! { |a, b| a.name <=> b.name }
+      @mod_list.sort! do |a, b|
+        return -1 if CORE_MODS.include? a.name
+        return 1  if CORE_MODS.include? b.name
+
+        a.name <=> b.name
+      end
     end
 
     def remove_mod(mod)
