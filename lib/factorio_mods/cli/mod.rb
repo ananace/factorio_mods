@@ -6,6 +6,7 @@ class Mod < Thor
 
   desc 'show', 'Lists all mods'
   def show
+    puts "Using Factorio #{$CLI._install.version.bold} @ #{$CLI._install.mods_path}\n\n"
     puts 'Installed mods;'.light_green.bold
     $CLI._mods.mods.each do |mod|
       puts "#{mod.enabled ? '+'.light_green.bold : '-'.light_yellow.bold} #{mod.name} (#{mod.info[:version]})"
