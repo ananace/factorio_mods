@@ -2,7 +2,7 @@ require 'inifile'
 
 module FactorioMods
   class Install
-    attr_reader :base_path, :version, :architecture, :is_steam
+    attr_reader :base_path, :architecture
 
     def self.discover
       to_scan = if FactorioMods::OS.windows?
@@ -29,11 +29,6 @@ module FactorioMods
       @base_path = File.expand_path path
       return unless valid?
 
-      info = JSON.parse(File.read(File.join(mod_path('base'), 'info.json')),
-                        symbolize_names: true)
-
-      @version = info[:version]
-      @is_steam = !(path.tr('\\', '/') =~ %r{/steamapps/common/}i).nil?
       @architecture = Dir.entries(File.join(base_path, 'bin'))
                          .reject { |e| e.start_with? '.' }
                          .first
@@ -119,8 +114,16 @@ module FactorioMods
     end
 
     def headless?
-      # TODO: Improve
-      !Dir.exist?(File.join(mod_path('core'), 'fonts'))
+      binary_info.include? 'headless'
+    end
+
+    def steam?
+      !(base_path.tr('\\', '/') =~ %r{/steamapps/common/}i).nil?
+    end
+
+    def version
+      return nil unless @architecture && Dir.exist?(bin_path) && File.exist?(File.join(bin_path, 'factorio'))
+      binary_info.match(/Version: (\S+)/)[1]
     end
 
     protected
@@ -140,6 +143,12 @@ module FactorioMods
         config = IniFile.load File.join(base_path, 'config-path.cfg')
         config['global']['use-system-read-write-data-directories']
       end
+    end
+
+    private
+
+    def binary_info
+      @binary_info ||= `#{File.join bin_path, 'factorio'} --version`
     end
   end
 end
