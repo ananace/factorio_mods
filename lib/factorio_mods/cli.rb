@@ -60,7 +60,7 @@ class CLI < Thor
     end
 
     def _installs
-      @installs ||= FactorioMods::Install.discover
+      (@installs ||= FactorioMods::Install.discover) + _cache.additional_installs
     end
 
     def _install

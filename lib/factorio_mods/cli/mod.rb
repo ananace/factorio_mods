@@ -2,7 +2,9 @@ module FactorioMods
 class CLI
 
 class Mod < Thor
-  default_command 'show'
+  default_command :show
+
+  map 'list' => :show
 
   desc 'show', 'Lists all mods'
   def show

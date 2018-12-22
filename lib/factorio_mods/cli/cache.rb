@@ -12,6 +12,11 @@ module Cache
       key?(:username) && key?(:token)
     end
 
+    def additional_installs
+      return [] unless key? :installs
+      installs.map { |path| FactorioMods::Install.new path }
+    end
+
     def respond_to_missing?(name, *_args)
       key? name
     end
