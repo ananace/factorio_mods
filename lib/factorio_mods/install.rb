@@ -118,6 +118,11 @@ module FactorioMods
         File.exist?(File.join(mod_path('base'), 'info.json'))
     end
 
+    def headless?
+      # TODO: Improve
+      !Dir.exist?(File.join(mod_path('core'), 'fonts'))
+    end
+
     protected
 
     def system_path
