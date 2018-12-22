@@ -5,6 +5,9 @@ class Mod < Thor
   default_command :show
 
   map 'list' => :show
+  map 'install' => :add
+  map 'rm' => :remove
+  map 'uninstall' => :remove
 
   desc 'show', 'Lists all mods'
   def show
@@ -17,29 +20,50 @@ class Mod < Thor
 
   desc 'add', 'Adds a mod'
   def add(mod)
+    mod = $CLI._mods.get_mod(mod)
+    if mod
+      puts "#{mod.name} is already installed."
+      return
+    end
     $CLI._mods.install_mod(mod)
     $CLI._mods.save!
+    mod = $CLI._mods.get_mod(mod)
+    puts "Installed #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
   desc 'remove', 'Removes a mod'
   def remove(mod)
+    mod = $CLI._mods.get_mod(mod)
     $CLI._mods.remove_mod(mod)
     $CLI._mods.save!
+    puts "Removed #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
   desc 'enable', 'Enables a mod'
   def enable(mod)
-    $CLI._mods.enable_mod mod
+    mod = $CLI._mods.get_mod(mod)
+    if mod.enabled
+      puts "#{mod.name} is already enabled."
+      return
+    end
+    mod.enabled = true
     $CLI._mods.save!
+    puts "Enabled #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
   desc 'disable', 'Disables a mod'
   def disable(mod)
-    $CLI._mods.disable_mod mod
+    mod = $CLI._mods.get_mod(mod)
+    unless mod.enabled
+      puts "#{mod.name} is already disabled."
+      return
+    end
+    mod.enabled = false
     $CLI._mods.save!
+    puts "Disabled #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 end

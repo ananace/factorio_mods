@@ -51,7 +51,7 @@ module FactorioMods
     def save!
       ensure_moddir!
       data = {
-        mods: @mod_list.map do |mod|
+        mods: mods.map do |mod|
           {
             name: mod.name,
             enabled: mod.enabled
@@ -84,8 +84,8 @@ module FactorioMods
 
       release.download_to(install.mods_path)
 
-      @mod_list << InstalledMod.new(self, mod.name, true)
-      @mod_list.sort! do |a, b|
+      mods.new(self, mod.name, true)
+      mods.sort! do |a, b|
         return -1 if CORE_MODS.include? a.name
         return 1  if CORE_MODS.include? b.name
 
@@ -101,17 +101,21 @@ module FactorioMods
         File.delete file if File.file? file
       end
 
-      @mod_list.delete_if { |m| m.name == mod }
+      mods.delete_if { |m| m.name == mod }
     end
 
     def enable_mod(mod)
-      entry = @mod_list.find { |m| m.name == mod }
+      entry = mods.find { |m| m.name == mod }
       entry.enabled = true if entry
     end
 
     def disable_mod(mod)
-      entry = @mod_list.find { |m| m.name == mod }
+      entry = mods.find { |m| m.name == mod }
       entry.enabled = false if entry
+    end
+
+    def get_mod(mod)
+      mods.find { |m| m.name == mod }
     end
 
     def mods
