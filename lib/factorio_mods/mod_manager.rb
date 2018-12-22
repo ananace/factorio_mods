@@ -39,12 +39,17 @@ module FactorioMods
     end
 
     def reload!
-      @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)[:mods].map do |mod|
-        InstalledMod.new(self, mod[:name], mod[:enabled])
+      if File.exist? install.modlist_path
+        @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)[:mods].map do |mod|
+          InstalledMod.new(self, mod[:name], mod[:enabled])
+        end
+      else
+        @mod_list = [InstalledMod.new(self, 'base', true)]
       end
     end
 
     def save!
+      ensure_moddir!
       data = {
         mods: @mod_list.map do |mod|
           {
@@ -56,7 +61,12 @@ module FactorioMods
       File.write(install.modlist_path, JSON.generate(data, indent: '  ', space: ' ', array_nl: "\n", object_nl: "\n"))
     end
 
+    def ensure_moddir!
+      Dir.mkdir install.mods_path unless Dir.exist? install.mods_path
+    end
+
     def install_mod(mod, options = {})
+      ensure_moddir!
       mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
       mod.reload! unless mod.releases
 
