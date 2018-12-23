@@ -118,7 +118,7 @@ module FactorioMods
     end
 
     def steam?
-      !(base_path.tr('\\', '/') =~ %r{/steamapps/common/}i).nil?
+      !(base_path.tr('\\', '/').downcase =~ %r{/steamapps/common/}i).nil?
     end
 
     def version
