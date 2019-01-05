@@ -15,28 +15,49 @@ class Mod < Thor
     end
   end
 
-  desc 'add', 'Adds a mod'
+  desc 'sort', 'Resort mods'
+  def sort
+    $CLI._mods.mods.sort_mods!
+    $CLI._mods.save!
+    invoke :show, []
+  end
+
+  desc 'search STRING', 'Searches the online repository'
+  def search(string)
+
+  end
+
+  desc 'add MOD', 'Adds a mod'
   def add(mod)
     $CLI._mods.install_mod(mod)
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'remove', 'Removes a mod'
+  desc 'update MOD', 'Updates a mod'
+  def update(mod)
+    # TODO: Improve
+    $CLI._mods.remove_mod(mod)
+    $CLI._mods.install_mod(mod)
+    $CLI._mods.save!
+    invoke :show, []
+  end
+
+  desc 'remove MOD', 'Removes a mod'
   def remove(mod)
     $CLI._mods.remove_mod(mod)
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'enable', 'Enables a mod'
+  desc 'enable MOD', 'Enables a mod'
   def enable(mod)
     $CLI._mods.enable_mod mod
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'disable', 'Disables a mod'
+  desc 'disable MOD', 'Disables a mod'
   def disable(mod)
     $CLI._mods.disable_mod mod
     $CLI._mods.save!
