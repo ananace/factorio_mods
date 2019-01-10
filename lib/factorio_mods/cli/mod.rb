@@ -27,39 +27,49 @@ class Mod < Thor
 
   end
 
-  desc 'add MOD', 'Adds a mod'
-  def add(mod)
-    $CLI._mods.install_mod(mod)
+  desc 'add MOD...', 'Adds a mod'
+  def add(*mods)
+    mods.each do |mod|
+      $CLI._mods.install_mod(mod)
+    end
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'update MOD', 'Updates a mod'
-  def update(mod)
+  desc 'update MOD...', 'Updates a mod'
+  def update(*mods)
     # TODO: Improve
-    $CLI._mods.remove_mod(mod)
-    $CLI._mods.install_mod(mod)
+    mods.each do |mod|
+      $CLI._mods.remove_mod(mod)
+      $CLI._mods.install_mod(mod)
+    end
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'remove MOD', 'Removes a mod'
-  def remove(mod)
-    $CLI._mods.remove_mod(mod)
+  desc 'remove MOD...', 'Removes a mod'
+  def remove(*mods)
+    mods.each do |mod|
+      $CLI._mods.remove_mod(mod)
+    end
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'enable MOD', 'Enables a mod'
-  def enable(mod)
-    $CLI._mods.enable_mod mod
+  desc 'enable MOD...', 'Enables a mod'
+  def enable(*mods)
+    mods.each do |mod|
+      $CLI._mods.enable_mod mod
+    end
     $CLI._mods.save!
     invoke :show, []
   end
 
-  desc 'disable MOD', 'Disables a mod'
-  def disable(mod)
-    $CLI._mods.disable_mod mod
+  desc 'disable MOD...', 'Disables a mod'
+  def disable(*mods)
+    mods.each do |mod|
+      $CLI._mods.disable_mod mod
+    end
     $CLI._mods.save!
     invoke :show, []
   end
