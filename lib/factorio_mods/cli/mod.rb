@@ -18,52 +18,62 @@ class Mod < Thor
     end
   end
 
-  desc 'add', 'Adds a mod'
-  def add(mod)
-    mod = $CLI._mods.get_mod(mod)
-    if mod
-      puts "#{mod.name} is already installed."
-      return
-    end
-    $CLI._mods.install_mod(mod)
+  desc 'sort', 'Resort mods'
+  def sort
+    $CLI._mods.sort_mods!
     $CLI._mods.save!
-    mod = $CLI._mods.get_mod(mod)
-    puts "Installed #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
-  desc 'remove', 'Removes a mod'
-  def remove(mod)
-    mod = $CLI._mods.get_mod(mod)
-    $CLI._mods.remove_mod(mod)
+  desc 'search STRING', 'Searches the online repository'
+  def search(string)
+
+  end
+
+  desc 'add MOD...', 'Adds a mod'
+  def add(*mods)
+    mods.each do |mod|
+      $CLI._mods.install_mod(mod)
+    end
     $CLI._mods.save!
-    puts "Removed #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
-  desc 'enable', 'Enables a mod'
-  def enable(mod)
-    mod = $CLI._mods.get_mod(mod)
-    if mod.enabled
-      puts "#{mod.name} is already enabled."
-      return
+  desc 'update MOD...', 'Updates a mod'
+  def update(*mods)
+    # TODO: Improve
+    mods.each do |mod|
+      $CLI._mods.remove_mod(mod)
+      $CLI._mods.install_mod(mod)
     end
-    mod.enabled = true
     $CLI._mods.save!
-    puts "Enabled #{mod.name} (#{mod.info[:version]})"
     invoke :show, []
   end
 
-  desc 'disable', 'Disables a mod'
-  def disable(mod)
-    mod = $CLI._mods.get_mod(mod)
-    unless mod.enabled
-      puts "#{mod.name} is already disabled."
-      return
+  desc 'remove MOD...', 'Removes a mod'
+  def remove(*mods)
+    mods.each do |mod|
+      $CLI._mods.remove_mod(mod)
     end
-    mod.enabled = false
     $CLI._mods.save!
-    puts "Disabled #{mod.name} (#{mod.info[:version]})"
+    invoke :show, []
+  end
+
+  desc 'enable MOD...', 'Enables a mod'
+  def enable(*mods)
+    mods.each do |mod|
+      $CLI._mods.enable_mod mod
+    end
+    $CLI._mods.save!
+    invoke :show, []
+  end
+
+  desc 'disable MOD...', 'Disables a mod'
+  def disable(*mods)
+    mods.each do |mod|
+      $CLI._mods.disable_mod mod
+    end
+    $CLI._mods.save!
     invoke :show, []
   end
 end

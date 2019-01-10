@@ -82,15 +82,12 @@ module FactorioMods
                   release.max { |r| r.released_at.to_i }
                 end
 
+      raise "Unable to find a release matching #{options[:version]}" if options[:version] and release.nil?
+
       release.download_to(install.mods_path)
 
-      mods.new(self, mod.name, true)
-      mods.sort! do |a, b|
-        return -1 if CORE_MODS.include? a.name
-        return 1  if CORE_MODS.include? b.name
-
-        a.name <=> b.name
-      end
+      @mod_list << InstalledMod.new(self, mod.name, true)
+      sort_mods!
     end
 
     def remove_mod(mod)
@@ -114,8 +111,16 @@ module FactorioMods
       entry.enabled = false if entry
     end
 
-    def get_mod(mod)
-      mods.find { |m| m.name == mod }
+    def sort_mods!
+      mods.sort! do |a, b|
+        if CORE_MODS.include? a.name
+          -1
+        elsif CORE_MODS.include? b.name
+          1
+        else
+          a.name <=> b.name
+        end
+      end
     end
 
     def mods
