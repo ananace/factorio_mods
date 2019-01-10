@@ -91,6 +91,7 @@ module FactorioMods
     end
 
     def remove_mod(mod)
+      mod = mod.to_s unless mod.is_a? String
       file = install.mod_path(mod)
 
       if file
@@ -102,13 +103,18 @@ module FactorioMods
     end
 
     def enable_mod(mod)
-      entry = mods.find { |m| m.name == mod }
+      entry = get_mod(mod)
       entry.enabled = true if entry
     end
 
     def disable_mod(mod)
-      entry = mods.find { |m| m.name == mod }
+      entry = get_mod(mod)
       entry.enabled = false if entry
+    end
+
+    def get_mod(mod)
+      mod = mod.to_s unless mod.is_a? String
+      mods.find { |m| m.name == mod }
     end
 
     def sort_mods!
