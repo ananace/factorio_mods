@@ -18,6 +18,8 @@ module FactorioMods
         else
           JSON.parse(File.read(File.join(mod, 'info.json')), symbolize_names: true)
         end
+      rescue StandardError => ex
+        { error: ex }
       end
     end
 
@@ -107,6 +109,8 @@ module FactorioMods
       raise 'Not installed' unless local_mod
 
       mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
+      raise 'Unable to find mod' unless mod
+
       mod.reload! unless mod.releases
 
       release = mod.releases
@@ -115,7 +119,7 @@ module FactorioMods
 
       cur_release = local_mod.info[:version]
 
-      return if release == cur_release
+      return false if release.version == cur_release
 
       cur_file = install.mod_path(local_mod.name)
       if cur_file
@@ -123,7 +127,9 @@ module FactorioMods
         File.delete cur_file if File.file? cur_file
       end
 
+      local_mod.instance_variable_set :@info, nil
       release.download_to(install.mods_path)
+      true
     end
 
     def enable_mod(mod)
@@ -142,13 +148,13 @@ module FactorioMods
     end
 
     def sort_mods!
-      mods.sort! do |a, b|
+      @mod_list = mods.uniq(&:name).sort do |a, b|
         if CORE_MODS.include? a.name
           -1
         elsif CORE_MODS.include? b.name
           1
         else
-          a.name <=> b.name
+          a.name.downcase <=> b.name.downcase
         end
       end
     end
