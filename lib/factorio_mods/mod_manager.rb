@@ -102,6 +102,30 @@ module FactorioMods
       mods.delete_if { |m| m.name == mod }
     end
 
+    def update_mod(mod)
+      local_mod = get_mod(mod)
+      raise 'Not installed' unless local_mod
+
+      mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
+      mod.reload! unless mod.releases
+
+      release = mod.releases
+                   .select { |r| install.version.start_with? r.factorio_version }
+                   .max { |r| r.released_at.to_i }
+
+      cur_release = local_mod.info[:version]
+
+      return if release == cur_release
+
+      cur_file = install.mod_path(local_mod.name)
+      if cur_file
+        Dir.delete cur_file if File.directory? cur_file
+        File.delete cur_file if File.file? cur_file
+      end
+
+      release.download_to(install.mods_path)
+    end
+
     def enable_mod(mod)
       entry = get_mod(mod)
       entry.enabled = true if entry
