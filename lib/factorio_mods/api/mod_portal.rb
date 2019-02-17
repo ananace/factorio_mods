@@ -1,3 +1,5 @@
+require 'cgi'
+require 'erb'
 require 'json'
 
 module FactorioMods::Api
@@ -24,20 +26,20 @@ module FactorioMods::Api
     end
 
     def self.mod(name)
-      uri = URI(BASE_URL + '/api/mods/' + name)
+      uri = URI(BASE_URL + '/api/mods/' + ERB::Util.url_encode(name))
       FactorioMods::Mod.new JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end
 
     def self.mods(*names)
       uri = URI(BASE_URL + '/api/mods')
-      uri.query = 'page_size=max&' + names.map { |mod| "namelist=#{mod}" }.join('&')
+      uri.query = 'page_size=max&' + names.map { |mod| "namelist=#{CGI.escape mod}" }.join('&')
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
           .fetch(:results)
           .map { |mod| FactorioMods::Mod.new mod }
     end
 
     def self.raw_mod(name)
-      uri = URI(BASE_URL + '/api/mods/' + name)
+      uri = URI(BASE_URL + '/api/mods/' + ERB::Util.url_encode(name))
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
     end
   end
