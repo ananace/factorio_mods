@@ -43,13 +43,18 @@ class Mod < Thor
 
   desc 'update MOD...|all', 'Updates a mod'
   def update(*mods)
-    mods = $CLI._mods.mods.map(&:name) if mods.size == 1 && mods.first == 'all'
+    if mods.size == 1 && mods.first == 'all'
+      mods = $CLI._mods.mods.map(&:name)
+      mods.delete 'base'
+      mods.delete 'core'
+    end
+
     mods.each do |mod|
       mod = $CLI._mods.get_mod(mod)
       next unless mod
-      $CLI._mods.update_mod(mod)
+      updated = $CLI._mods.update_mod(mod)
       after = $CLI._mods.get_mod(mod)
-      puts "Updated mod #{mod.name} from #{mod.info[:version]} => #{after.info[:version]}"
+      puts "Updated mod #{mod.name} from #{mod.info[:version]} => #{after.info[:version]}" if updated
     end
     $CLI._mods.save!
     invoke :show, []
