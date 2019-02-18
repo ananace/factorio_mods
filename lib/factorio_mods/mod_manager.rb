@@ -70,6 +70,8 @@ module FactorioMods
     def install_mod(mod, options = {})
       ensure_moddir!
       mod = FactorioMods::Api::ModPortal.mod mod.to_s unless mod.is_a? FactorioMods::Mod
+      raise 'Failed to look up mod' unless mod
+
       mod.reload! unless mod.releases
 
       release = mod.releases
@@ -138,6 +140,8 @@ module FactorioMods
     end
 
     def disable_mod(mod)
+      return if mod == 'base'
+
       entry = get_mod(mod)
       entry.enabled = false if entry
     end

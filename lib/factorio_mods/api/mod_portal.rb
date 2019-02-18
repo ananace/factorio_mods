@@ -26,8 +26,7 @@ module FactorioMods::Api
     end
 
     def self.mod(name)
-      uri = URI(BASE_URL + '/api/mods/' + ERB::Util.url_encode(name))
-      FactorioMods::Mod.new JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
+      FactorioMods::Mod.new raw_mod(name)
     end
 
     def self.mods(*names)

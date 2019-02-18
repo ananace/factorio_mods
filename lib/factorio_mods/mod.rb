@@ -39,7 +39,7 @@ module FactorioMods
       end
 
       def download
-        Net::HTTP.get(download_url)
+        Net::HTTP.get_response(download_url)
       end
 
       def download_to(path)
@@ -56,6 +56,7 @@ module FactorioMods
             if resp.is_a? Net::HTTPFound
               Net::HTTP.get_response(URI(resp['location']), &store)
             else
+              raise 'Received text/html response, login page?' if resp['content-type'] == 'text/html'
               store.call resp
             end
           end
