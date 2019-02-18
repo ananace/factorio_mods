@@ -8,6 +8,7 @@ class CLI < Thor
   autoload :Cache, 'factorio_mods/cli/cache'
   autoload :Install, 'factorio_mods/cli/install'
   autoload :Mod, 'factorio_mods/cli/mod'
+  autoload :Pack, 'factorio_mods/cli/pack'
 
   option :install, type: :string
 
@@ -43,6 +44,11 @@ class CLI < Thor
   subcommand 'mod', Mod
   desc 'mods', '', hide: true
   subcommand 'mods', Mod
+
+  desc 'pack', '', hide: true
+  subcommand 'pack', Pack
+  desc 'packs', '', hide: true
+  subcommand 'packs', Pack
 
 
   no_commands do
