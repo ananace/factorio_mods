@@ -2,9 +2,7 @@ require 'colorize'
 require 'factorio_mods'
 require 'thor'
 
-module FactorioMods
-
-class CLI < Thor
+class FactorioMods::CLI < Thor
   autoload :Cache, 'factorio_mods/cli/cache'
   autoload :Install, 'factorio_mods/cli/install'
   autoload :Mod, 'factorio_mods/cli/mod'
@@ -50,7 +48,9 @@ class CLI < Thor
   desc 'packs', '', hide: true
   subcommand 'packs', Pack
 
-
+  # Need to do all non-command code in the block
+  #
+  # rubocop:disable Metrics/BlockLength
   no_commands do
     def _cache_path
       File.expand_path('~/.cache/factorio-manager.json')
@@ -94,6 +94,4 @@ class CLI < Thor
       @mods ||= _install.mod_manager
     end
   end
-end
-
 end

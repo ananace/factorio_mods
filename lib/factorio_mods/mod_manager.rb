@@ -41,13 +41,13 @@ module FactorioMods
     end
 
     def reload!
-      if File.exist? install.modlist_path
-        @mod_list = JSON.parse(File.read(install.modlist_path), symbolize_names: true)[:mods].map do |mod|
-          InstalledMod.new(self, mod[:name], mod[:enabled])
-        end
-      else
-        @mod_list = [InstalledMod.new(self, 'base', true)]
-      end
+      @mod_list = if File.exist? install.modlist_path
+                    JSON.parse(File.read(install.modlist_path), symbolize_names: true)[:mods].map do |mod|
+                      InstalledMod.new(self, mod[:name], mod[:enabled])
+                    end
+                  else
+                    [InstalledMod.new(self, 'base', true)]
+                  end
     end
 
     def save!
@@ -86,7 +86,7 @@ module FactorioMods
                   release.max { |r| r.released_at.to_i }
                 end
 
-      raise "Unable to find a release matching #{options[:version]}" if options[:version] and release.nil?
+      raise "Unable to find a release matching #{options[:version]}" if options[:version] && release.nil?
 
       release.download_to(install.mods_path)
 
