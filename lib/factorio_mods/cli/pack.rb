@@ -10,27 +10,32 @@ class FactorioMods::CLI
 
     desc 'show', 'Lists all modpacks'
     def show
-      puts '* vanilla'
+      raise NotImplementedError
     end
 
     desc 'new PACK', 'Creates a new modpack'
-    def new(pack)
-      mods = $CLI._mods.enabled_mods
-      pack = Object.new
+    def new(_pack)
+      raise NotImplementedError
+      # mods = _cli._mods.enabled_mods
+      # pack = Object.new
 
       # Store pack
-
-      true
     end
 
     desc 'delete PACK', 'Deletes a new modpack'
-    def delete(pack)
-      true
+    def delete(_pack)
+      raise NotImplementedError
     end
 
     desc 'use PACK', 'Switches to a specific modpack'
-    def use(pack)
-      true
+    def use(_pack)
+      raise NotImplementedError
+    end
+
+    no_commands do
+      def _cli
+        FactorioMods::CLI.singleton
+      end
     end
   end
 end

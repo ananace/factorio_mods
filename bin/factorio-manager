@@ -4,6 +4,9 @@ require 'factorio_mods/cli'
 
 begin
   FactorioMods::CLI.start
+rescue StandardError => ex
+  puts ex
+  raise
 ensure
-  $CLI._save_cache
+  FactorioMods::CLI.singleton._save_cache
 end

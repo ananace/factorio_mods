@@ -17,12 +17,12 @@ class FactorioMods::CLI < Thor
   def initialize(*args)
     super
 
-    $CLI = self
+    self.class.send :singleton=, self
 
-    if _cache.authed?
-      FactorioMods::Api::WebAuthentication.username = _cache.username
-      FactorioMods::Api::WebAuthentication.token = _cache.token
-    end
+    return unless _cache.authed?
+
+    FactorioMods::Api::WebAuthentication.username = _cache.username
+    FactorioMods::Api::WebAuthentication.token = _cache.token
   end
 
   desc 'login', 'Log in to the Factorio web API'
@@ -92,6 +92,20 @@ class FactorioMods::CLI < Thor
 
     def _mods
       @mods ||= _install.mod_manager
+    end
+  end
+
+  class << self
+    def singleton
+      @cli
+    end
+
+    private
+
+    def singleton=(obj)
+      raise 'Already set' unless @cli.nil?
+
+      @cli = obj
     end
   end
 end
