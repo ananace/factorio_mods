@@ -14,12 +14,11 @@ class FactorioMods::CLI
     end
 
     desc 'new PACK', 'Creates a new modpack'
-    def new(_pack)
-      raise NotImplementedError
-      # mods = _cli._mods.enabled_mods
-      # pack = Object.new
+    def new(pack)
+      mods = _cli._mods.enabled_mods
+      pack = mods.map(&:name)
 
-      # Store pack
+      (_cli._cache[:packs] ||= {})[pack] = pack
     end
 
     desc 'delete PACK', 'Deletes a new modpack'
