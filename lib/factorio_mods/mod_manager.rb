@@ -77,6 +77,8 @@ module FactorioMods
       release = mod.releases
                    .select { |r| install.version.start_with? r.factorio_version }
 
+      raise "No releases for Factorio version #{install.version}" if release.empty?
+
       release = if options[:version]
                   release.find do |r|
                     # Use rubygems version matching, to support things like '~> 1.0'
