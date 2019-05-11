@@ -34,6 +34,11 @@ class FactorioMods::CLI
       )
     end
 
+    desc 'launch [NAME]', 'Launches the active (or named) install'
+    def launch(install = nil)
+      raise NotImplementedError, 'Not implemented'
+    end
+
     desc 'add PATH', 'Adds a manual install'
     def add(path)
       install = FactorioMods::Install.new path
