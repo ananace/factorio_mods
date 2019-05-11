@@ -123,6 +123,7 @@ module FactorioMods
 
       cur_release = local_mod.info[:version]
 
+      raise "Unable to update mod #{mod.name}, no release for current version" if release.nil?
       return false if release.version == cur_release
 
       cur_file = install.mod_path(local_mod.name)
