@@ -1,6 +1,12 @@
 #!/usr/bin/env ruby
 
 require 'factorio_mods/cli'
+require 'logging'
+
+Logging::Logger[FactorioMods].tap do |root|
+  logger.add_appenders ::Logging.appenders.stdout
+  logger.level = :info
+end
 
 begin
   FactorioMods::CLI.start

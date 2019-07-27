@@ -1,3 +1,4 @@
+require 'logging'
 require 'time'
 
 module FactorioMods
@@ -46,7 +47,7 @@ module FactorioMods
         path = File.join path, file_name if Dir.exist? path
 
         File.open(path, 'wb') do |file|
-          puts "Saving to #{file.path}..."
+          logger.debug "Saving to #{file.path}..."
           store = proc do |resp|
             resp.value
             resp.read_body { |data| file.write(data) }
@@ -78,6 +79,12 @@ module FactorioMods
 
       def released_at=(time)
         @released_at = Time.parse time
+      end
+
+      private
+
+      def logger
+        Logging::Logger[self]
       end
     end
 

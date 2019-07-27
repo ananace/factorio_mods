@@ -1,6 +1,7 @@
 require 'cgi'
 require 'erb'
 require 'json'
+require 'logging'
 
 module FactorioMods::Api
   ## Information taken from https://wiki.factorio.com/Mod_portal_API
@@ -14,7 +15,7 @@ module FactorioMods::Api
       uri.query = data.map { |k, v| "#{k}=#{v}" }.join '&'
 
       data = JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
-      puts data
+      logger.debug data
       results = data.fetch(:results).map { |mod| FactorioMods::Mod.new mod }
       while paginate && data[:pagination][:links][:next]
         uri = URI(data[:pagination][:links][:next])
@@ -40,6 +41,10 @@ module FactorioMods::Api
     def self.raw_mod(name)
       uri = URI(BASE_URL + '/api/mods/' + ERB::Util.url_encode(name))
       JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
+    end
+
+    def self.logger
+      Logging::Logger[self]
     end
   end
 end

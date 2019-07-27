@@ -1,5 +1,6 @@
 require 'colorize'
 require 'factorio_mods'
+require 'logging'
 require 'thor'
 
 class FactorioMods::CLI < Thor
@@ -9,6 +10,7 @@ class FactorioMods::CLI < Thor
   autoload :Pack, 'factorio_mods/cli/pack'
 
   option :install, type: :string
+  # option :verbose { Logging::Logger[FactorioMods].level = :debug }
 
   def self.exit_on_failure?
     true
