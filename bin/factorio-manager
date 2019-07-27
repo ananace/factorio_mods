@@ -1,20 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'factorio_mods/cli'
-require 'optparse'
-
-options = {}
-opts = OptParse.new do |o|
-  o.on('-I', '--installation=INSTALLATION', 'Select the active installation') do |inst|
-    options[:installation] = inst
-  end
-
-  o.on('-h', '--help', 'Shows this information') do
-    puts opts
-    exit
-  end
-end
-opts.parse!
 
 begin
   FactorioMods::CLI.start
