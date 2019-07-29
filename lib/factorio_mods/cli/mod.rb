@@ -16,6 +16,19 @@ class FactorioMods::CLI
       end
     end
 
+    desc 'enablef', 'Enable force mods'
+    def enablef(*mods)
+      mods.each do |name|
+        mod = _cli._mods.get_mod(name)
+        if mod
+          mod.enabled = true
+        else
+          _cli._mods.mods << FactorioMods::InstalledMod.new(_cli._mods, name, true)
+        end
+      end
+      _cli._mods.save!
+    end
+
     desc 'sort', 'Resort mods'
     def sort
       _cli._mods.sort_mods!
@@ -50,9 +63,12 @@ class FactorioMods::CLI
       mods.each do |mod|
         mod = _cli._mods.get_mod(mod)
         next unless mod
+
+        oldinfo = mod.info
         updated = _cli._mods.update_mod(mod)
         after = _cli._mods.get_mod(mod)
-        puts "Updated mod #{mod.name} from #{mod.info[:version]} => #{after.info[:version]}" if updated
+
+        puts "Updated mod #{mod.name} from #{oldinfo[:version]} => #{after.info[:version]}" if updated
       end
       _cli._mods.save!
       invoke :show, []
@@ -70,8 +86,10 @@ class FactorioMods::CLI
       invoke :show, []
     end
 
-    desc 'enable MOD...', 'Enables a mod'
+    desc 'enable MOD...|all', 'Enables a mod'
     def enable(*mods)
+      mods = _cli._mods.mods.map(&:name) if mods.size == 1 && mods.first == 'all'
+
       mods.each do |mod|
         mod = _cli._mods.get_mod(mod)
         next unless mod
