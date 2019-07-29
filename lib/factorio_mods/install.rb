@@ -18,7 +18,9 @@ module FactorioMods
                 elsif FactorioMods::OS.linux?
                   [
                     '~/.steam/steam/steamapps/common/Factorio',
-                    '~/.factorio'
+                    '~/.var/app/com.valvesoftware.Steam/.steam/steam/steamapps/common/Factorio',
+                    '~/.factorio',
+                    '~/.var/app/com.valvesoftware.Steam/.factorio'
                   ]
                 end
 
