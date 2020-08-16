@@ -40,6 +40,10 @@ module FactorioMods
       @mod_manager ||= ModManager.new self
     end
 
+    def config
+      @config ||= IniFile.load(File.join(system_path, 'config', 'config.ini'))
+    end
+
     def binary
       if OS.windows?
         File.join bin_path, 'factorio.exe'
@@ -51,8 +55,6 @@ module FactorioMods
     def read_path
       @read_path ||= begin
         if uses_system_paths
-          config = IniFile.load(File.join(system_path, 'config', 'config.ini'))
-
           config['path']['read-data']
             .gsub('__PATH__system-read-data__', system_path)
             .gsub('__PATH__system-write-data__', system_path)
@@ -66,8 +68,6 @@ module FactorioMods
     def write_path
       @write_path ||= begin
         if uses_system_paths
-          config = IniFile.load(File.join(system_path, 'config', 'config.ini'))
-
           config['path']['write-data']
             .gsub('__PATH__system-read-data__', system_path)
             .gsub('__PATH__system-write-data__', system_path)

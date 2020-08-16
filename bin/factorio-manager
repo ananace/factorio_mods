@@ -3,7 +3,7 @@
 require 'factorio_mods/cli'
 require 'logging'
 
-Logging::Logger[FactorioMods].tap do |root|
+Logging::Logger[FactorioMods].tap do |logger|
   logger.add_appenders ::Logging.appenders.stdout
   logger.level = :info
 end

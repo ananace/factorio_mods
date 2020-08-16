@@ -34,6 +34,26 @@ class FactorioMods::CLI
       )
     end
 
+    desc 'config', 'Shows configuration set on an install'
+    def config
+      return unless Install.ensure_valid
+
+      invoke :show, []
+
+      puts
+      cfg = _cli._install.config.to_h
+      cfg.each do |section, settings|
+        settings.each do |key, value|
+          puts format(
+            '  %s.%s => %s',
+            section,
+            key,
+            value.inspect
+          )
+        end
+      end
+    end
+
     desc 'launch [NAME]', 'Launches the active (or named) install'
     def launch(install = nil)
       raise NotImplementedError, 'Not implemented'
